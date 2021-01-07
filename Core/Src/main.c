@@ -239,7 +239,7 @@ int main(void)
 	  {
 		  if(tmp1>2.0&&tmp2>2.0&&tmp3>2.0&&tmp4>3.0&&acc_y>2.0)
 		  {
-			  sprintf(sprintbuff,"turn right!\n\r");
+			  sprintf(sprintbuff,"turn right!\n");
 			  memcpy(uartbuff,sprintbuff,sizeof(sprintbuff));
 			  HAL_UART_Transmit(&huart2,uartbuff,sizeof(uartbuff),1000);
 			  if(platform_x<=98)
@@ -252,7 +252,7 @@ int main(void)
 		  }
 		  else if(tmp1<-2.0&&tmp2<-2.0&&tmp3<-2.0&&tmp4<-2.0&&acc_y<-2.0)
 		  {
-			  sprintf(sprintbuff,"turn left!\n\r");
+			  sprintf(sprintbuff,"turn left!\n");
 			  memcpy(uartbuff,sprintbuff,sizeof(sprintbuff));
 			  HAL_UART_Transmit(&huart2,uartbuff,sizeof(uartbuff),1000);
 			  if(platform_x>=0 )
