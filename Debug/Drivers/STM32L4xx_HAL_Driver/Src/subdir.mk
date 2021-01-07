@@ -78,7 +78,7 @@ Drivers/STM32L4xx_HAL_Driver/Src/%.o: ../Drivers/STM32L4xx_HAL_Driver/Src/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: MCU GCC Compiler'
 	@echo $(PWD)
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -DUSE_HAL_DRIVER -DSTM32L476xx -I"C:/Users/CHEN/STM32Cube/Sample/gameboy_mini_ver1/Core/Inc" -I"C:/Users/CHEN/STM32Cube/Sample/gameboy_mini_ver1/Drivers/STM32L4xx_HAL_Driver/Inc" -I"C:/Users/CHEN/STM32Cube/Sample/gameboy_mini_ver1/Drivers/STM32L4xx_HAL_Driver/Inc/Legacy" -I"C:/Users/CHEN/STM32Cube/Sample/gameboy_mini_ver1/Drivers/CMSIS/Device/ST/STM32L4xx/Include" -I"C:/Users/CHEN/STM32Cube/Sample/gameboy_mini_ver1/Drivers/CMSIS/Include"  -Og -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -DUSE_HAL_DRIVER -DSTM32L476xx -I"C:/Users/jessi/workspace/gameboy_mini_ver1/Core/Inc" -I"C:/Users/jessi/workspace/gameboy_mini_ver1/Drivers/STM32L4xx_HAL_Driver/Inc" -I"C:/Users/jessi/workspace/gameboy_mini_ver1/Drivers/STM32L4xx_HAL_Driver/Inc/Legacy" -I"C:/Users/jessi/workspace/gameboy_mini_ver1/Drivers/CMSIS/Device/ST/STM32L4xx/Include" -I"C:/Users/jessi/workspace/gameboy_mini_ver1/Drivers/CMSIS/Include"  -Og -g3 -Wall -fmessage-length=0 -ffunction-sections -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

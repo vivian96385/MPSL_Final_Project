@@ -88,6 +88,15 @@ int platform_y = 120;
 int platform_width = 30;
 int platform_height = 5;
 
+char sprintbuff[64] = "";
+unsigned char uartbuff[64];
+float tmp1 = 0.0;
+float tmp2 = 0.0;
+float tmp3 = 0.0;
+float tmp4 = 0.0;
+
+int score = 0;
+
 struct Brick {
 	int x;
 	int y;
@@ -104,18 +113,13 @@ void collisionDetection(){
 			struct Brick b = Brick_Field[row][col];
 			if (b.status == 1)
 			{
-//				if (ball_x+ball_radius>=b.x && ball_x-ball_radius<=b.x+brickWidth && ball_y+ball_radius>=b.y && ball_y-ball_radius<=b.y+brickHeight)
-//				{
-//					ball_y_speed = -ball_y_speed;
-//					Brick_Field[row][col].status = 0;
-//					fillRect(Brick_Field[row][col].x, Brick_Field[row][col].y, brickWidth, brickHeight, BLACK);
-//				}
 				//left -> right side
 				if(ball_x+ball_radius>=b.x && ball_x+ball_radius<=b.x+brickWidth && ball_y>b.y && ball_y<b.y+brickHeight)
 				{
 					ball_x_speed = -ball_x_speed;
 					Brick_Field[row][col].status = 0;
 					fillRect(Brick_Field[row][col].x, Brick_Field[row][col].y, brickWidth, brickHeight, BLACK);
+					score++;
 				}
 				//right -> left side
 				else if (ball_x-ball_radius>=b.x && ball_x-ball_radius<=b.x+brickWidth && ball_y>b.y && ball_y<b.y+brickHeight)
@@ -123,6 +127,7 @@ void collisionDetection(){
 					ball_x_speed = -ball_x_speed;
 					Brick_Field[row][col].status = 0;
 					fillRect(Brick_Field[row][col].x, Brick_Field[row][col].y, brickWidth, brickHeight, BLACK);
+					score++;
 				}
 				//up -> down side
 				else if (ball_y+ball_radius>=b.y && ball_y+ball_radius<=b.y+brickHeight && ball_x>b.x && ball_x<b.x+brickWidth)
@@ -131,6 +136,7 @@ void collisionDetection(){
 					ball_y_speed = -ball_y_speed;
 					Brick_Field[row][col].status = 0;
 					fillRect(Brick_Field[row][col].x, Brick_Field[row][col].y, brickWidth, brickHeight, BLACK);
+					score++;
 				}
 				//down -> up side
 				else if (ball_y-ball_radius>=b.y && ball_y-ball_radius<=b.y+brickHeight && ball_x>b.x && ball_x<b.x+brickWidth)
@@ -139,6 +145,7 @@ void collisionDetection(){
 					ball_y_speed = -ball_y_speed;
 					Brick_Field[row][col].status = 0;
 					fillRect(Brick_Field[row][col].x, Brick_Field[row][col].y, brickWidth, brickHeight, BLACK);
+					score++;
 				}
 			}
 		}
@@ -146,6 +153,106 @@ void collisionDetection(){
 }
 
 
+void game(){
+	while (1)
+	  {
+	    /* USER CODE END WHILE */
+		uint8_t		imu_readings[IMU_NUMBER_OF_BYTES]={0};
+		int16_t 	accel_data[3];
+		float		acc_x, acc_y, acc_z;
+
+		  //testFastLines(RED, BLUE);
+		  GetAccelData(&hi2c1, (uint8_t*)imu_readings);
+		  accel_data[0] = (((int16_t)((uint8_t *)(imu_readings))[1] << 8) | ((uint8_t *)(imu_readings))[0]);      // Turn the MSB and LSB into a signed 16-bit value
+		  accel_data[1] = (((int16_t)((uint8_t *)(imu_readings))[3] << 8) | ((uint8_t *)(imu_readings))[2]);
+		  accel_data[2] = (((int16_t)((uint8_t *)(imu_readings))[5] << 8) | ((uint8_t *)(imu_readings))[4]);
+		  acc_x = ((float)(accel_data[0]))/100.0f; //m/s2
+		  acc_y = ((float)(accel_data[1]))/100.0f;
+		  acc_z = ((float)(accel_data[2]))/100.0f;
+		  if(acc_y<200 && acc_y>-200.0)
+		  {
+			  if(tmp1>2.0&&tmp2>2.0&&tmp3>2.0&&tmp4>3.0&&acc_y>2.0)
+			  {
+	//			  sprintf(sprintbuff,"0\n");
+	//			  memcpy(uartbuff,sprintbuff,sizeof(sprintbuff));
+	//			  HAL_UART_Transmit(&huart2,uartbuff,sizeof(uartbuff),1000);
+				  if(platform_x<=98)
+				  {
+					  fillRect(platform_x+5, platform_y, platform_width, platform_height, GREEN);
+					  fillRect(platform_x, platform_y, 5, platform_height, BLACK);
+					  platform_x+=5;
+				  }
+
+			  }
+			  else if(tmp1<-2.0&&tmp2<-2.0&&tmp3<-2.0&&tmp4<-2.0&&acc_y<-2.0)
+			  {
+				  //sprintf(sprintbuff,"1\n");
+				  //memcpy(uartbuff,sprintbuff,sizeof(sprintbuff));
+				  //HAL_UART_Transmit(&huart2,uartbuff,sizeof(uartbuff),1000);
+				  if(platform_x>=0 )
+				  {
+					  fillRect(platform_x-5, platform_y, platform_width, platform_height, GREEN);
+					  fillRect(platform_x+29, platform_y, 5, platform_height, BLACK);
+					  platform_x-=5;
+				  }
+
+			  }
+			  tmp4 = tmp3;
+			  tmp3 = tmp2;
+			  tmp2 = tmp1;
+			  tmp1 = acc_y;
+		  }
+
+		  collisionDetection();
+		  drawCircle(ball_x, ball_y, 4, BLACK);
+		  //board
+		  if((ball_y+ball_radius==platform_y-2 && ball_x>platform_x-8 && ball_x<platform_x+platform_width+8)|| ball_y+ball_radius<=0)
+		  {
+			  ball_y_speed = -ball_y_speed;
+
+			  if(ball_x>platform_x-8 && ball_x<(platform_x+(platform_width/3))) //left 1/3
+			  {
+				  if(ball_x_speed>=2)
+					  ball_x_speed--;
+			  }
+			  else if(ball_x>(platform_x+2*(platform_width/3)) && ball_x<platform_x+platform_width+8) // right 1/3
+			  {
+				  if(ball_x_speed<=5)
+				  		ball_x_speed++;
+			  }
+			  else // middle 1/3
+			  {
+
+			  }
+		  }
+
+		  if(ball_x <= 4 || ball_x >= 124) ball_x_speed = -ball_x_speed;
+		  ball_x += ball_x_speed;
+		  ball_y += ball_y_speed;
+		  drawCircle(ball_x, ball_y, 4, CYAN);
+
+		  if (ball_y>=124)
+		  {
+			  break;
+		  }
+
+		  //}
+		  //HAL_Delay(50);
+
+	    /* USER CODE BEGIN 3 */
+	  }
+	  /* USER CODE END 3 */
+}
+
+void game_reset(){
+	ball_x = 50;
+	ball_y = 90;
+	ball_x_speed = 2;
+	ball_y_speed = 2;
+	platform_x = 60;
+	platform_y = 120;
+	score = 0;
+}
 /* USER CODE END 0 */
 
 /**
@@ -155,9 +262,7 @@ void collisionDetection(){
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	uint8_t		imu_readings[IMU_NUMBER_OF_BYTES]={0};
-	int16_t 	accel_data[3];
-	float		acc_x, acc_y, acc_z;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -188,21 +293,13 @@ int main(void)
   /* USER CODE END 2 */
   //fillScreen(BLACK);
   //testAll();
-  /* Infinite loop */
+
   /* USER CODE BEGIN WHILE */
   //unsigned char address = 0x28;
-	char sprintbuff[64] = "";
-	unsigned char uartbuff[64];
-	float tmp1, tmp2, tmp3, tmp4;
-	tmp1 = 0.0;
-	tmp2 = 0.0;
-	tmp3 = 0.0;
-	tmp4 = 0.0;
-	int i = 0;
-	fillScreen(BLACK);
+  while(1){
 
 	  /* construct block field */
-
+	  fillScreen(BLACK);
 
 	  for(int row=0; row<brickRowCount; row++)
 	  {
@@ -215,115 +312,32 @@ int main(void)
 		  }
 	  }
 
-//	  int x=60;
-//	  int y=120;
-	  int direct = 0;
 	  fillRect(platform_x, platform_y, platform_width, platform_height, GREEN);
 	  drawCircle(50, 90, 4, CYAN);
 
-
-  while (1)
-  {
-    /* USER CODE END WHILE */
-
-
-	  //testFastLines(RED, BLUE);
-	  GetAccelData(&hi2c1, (uint8_t*)imu_readings);
-	  accel_data[0] = (((int16_t)((uint8_t *)(imu_readings))[1] << 8) | ((uint8_t *)(imu_readings))[0]);      // Turn the MSB and LSB into a signed 16-bit value
-	  accel_data[1] = (((int16_t)((uint8_t *)(imu_readings))[3] << 8) | ((uint8_t *)(imu_readings))[2]);
-	  accel_data[2] = (((int16_t)((uint8_t *)(imu_readings))[5] << 8) | ((uint8_t *)(imu_readings))[4]);
-	  acc_x = ((float)(accel_data[0]))/100.0f; //m/s2
-	  acc_y = ((float)(accel_data[1]))/100.0f;
-	  acc_z = ((float)(accel_data[2]))/100.0f;
-	  if(acc_y<200 && acc_y>-200.0)
+	  /* wait for start signal*/
+	  uint8_t value = 0;
+	  while(!value)
 	  {
-		  if(tmp1>2.0&&tmp2>2.0&&tmp3>2.0&&tmp4>3.0&&acc_y>2.0)
-		  {
-			  sprintf(sprintbuff,"turn right!\n");
-			  memcpy(uartbuff,sprintbuff,sizeof(sprintbuff));
-			  HAL_UART_Transmit(&huart2,uartbuff,sizeof(uartbuff),1000);
-			  if(platform_x<=98)
-			  {
-				  fillRect(platform_x+5, platform_y, platform_width, platform_height, GREEN);
-				  fillRect(platform_x, platform_y, 5, platform_height, BLACK);
-				  platform_x+=5;
-			  }
-
-		  }
-		  else if(tmp1<-2.0&&tmp2<-2.0&&tmp3<-2.0&&tmp4<-2.0&&acc_y<-2.0)
-		  {
-			  sprintf(sprintbuff,"turn left!\n");
-			  memcpy(uartbuff,sprintbuff,sizeof(sprintbuff));
-			  HAL_UART_Transmit(&huart2,uartbuff,sizeof(uartbuff),1000);
-			  if(platform_x>=0 )
-			  {
-				  fillRect(platform_x-5, platform_y, platform_width, platform_height, GREEN);
-				  fillRect(platform_x+29, platform_y, 5, platform_height, BLACK);
-				  platform_x-=5;
-			  }
-
-		  }
-		  tmp4 = tmp3;
-		  tmp3 = tmp2;
-		  tmp2 = tmp1;
-		  tmp1 = acc_y;
+		  HAL_UART_Receive(&huart2,(uint8_t *)&value,1, 1000);
 	  }
 
-	  collisionDetection();
-	  drawCircle(ball_x, ball_y, 4, BLACK);
-	  //board
-	  if((ball_y+ball_radius==platform_y-2 && ball_x>platform_x-8 && ball_x<platform_x+platform_width+8)|| ball_y+ball_radius<=0)
-	  {
-		  ball_y_speed = -ball_y_speed;
 
-		  if(ball_x>platform_x-8 && ball_x<(platform_x+(platform_width/3))) //left 1/3
-		  {
-			  if(ball_x_speed>=2)
-				  ball_x_speed--;
-		  }
-		  else if(ball_x>(platform_x+2*(platform_width/3)) && ball_x<platform_x+platform_width+8) // right 1/3
-		  {
-			  if(ball_x_speed<=5)
-			  		ball_x_speed++;
-		  }
-		  else // middle 1/3
-		  {
+	  /* game */
+	  game();
 
-		  }
-	  }
+	  /* wait for retry signal*/
 
-	  if(ball_x <= 4 || ball_x >= 124) ball_x_speed = -ball_x_speed;
-	  ball_x += ball_x_speed;
-	  ball_y += ball_y_speed;
-	  drawCircle(ball_x, ball_y, 4, CYAN);
-/*
-	  if(direct==0 && x>=0 && x<=98)
-	  {
-		  fillRect(x+1, 120, 30, 5, GREEN);
-		  fillRect(x, 120, 1, 5, BLACK);
-		  x++;
-	  }
-	  if(direct==1 && x>=0 && x<=98)
-	  {
-		  fillRect(x-1, 120, 30, 5, GREEN);
-		  fillRect(x+29, 120, 1, 5, BLACK);
-		  x--;
-	  }*/
-	  if(platform_x<=10)
-	  {
-		  direct=0;
-	  }
-	  else if(platform_x>=90)
-	  {
-		  direct=1;
-	  }
+	  /* send score */
+	  sprintf(sprintbuff,"%d\n", score);
+	  memcpy(uartbuff,sprintbuff,sizeof(sprintbuff));
+	  HAL_UART_Transmit(&huart2,uartbuff,sizeof(uartbuff),1000);
 
-	  //}
-	  //HAL_Delay(50);
+	  /* reset */
+	  game_reset();
 
-    /* USER CODE BEGIN 3 */
   }
-  /* USER CODE END 3 */
+
 }
 
 /**
