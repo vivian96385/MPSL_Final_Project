@@ -271,8 +271,28 @@ int main(void)
 
 	  collisionDetection();
 	  drawCircle(ball_x, ball_y, 4, BLACK);
-	  if((ball_y+ball_radius==platform_y-2 && ball_x>platform_x-8 && ball_x<platform_x+platform_width+8)|| ball_y+ball_radius<=0) ball_y_speed = -ball_y_speed;
-	  if(ball_x == 4 || ball_x == 124) ball_x_speed = -ball_x_speed;
+	  //board
+	  if((ball_y+ball_radius==platform_y-2 && ball_x>platform_x-8 && ball_x<platform_x+platform_width+8)|| ball_y+ball_radius<=0)
+	  {
+		  ball_y_speed = -ball_y_speed;
+
+		  if(ball_x>platform_x-8 && ball_x<(platform_x+(platform_width/3))) //left 1/3
+		  {
+			  if(ball_x_speed>=2)
+				  ball_x_speed--;
+		  }
+		  else if(ball_x>(platform_x+2*(platform_width/3)) && ball_x<platform_x+platform_width+8) // right 1/3
+		  {
+			  if(ball_x_speed<=5)
+			  		ball_x_speed++;
+		  }
+		  else // middle 1/3
+		  {
+
+		  }
+	  }
+
+	  if(ball_x <= 4 || ball_x >= 124) ball_x_speed = -ball_x_speed;
 	  ball_x += ball_x_speed;
 	  ball_y += ball_y_speed;
 	  drawCircle(ball_x, ball_y, 4, CYAN);
