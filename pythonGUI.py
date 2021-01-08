@@ -43,11 +43,11 @@ class Main(QMainWindow, ui.Ui_MainWindow):
         ser = serial.Serial("COM5", 115200)
         ser.write(b'1')
         ser.close()
-        self.score = ScoreThread()
-        self.score.trigger.connect(self.handleScore)
-        self.score.start()
-        self.pushButton.setEnabled(False)
-        self.pushButton_2.setEnabled(False)
+        # self.score = ScoreThread()
+        # self.score.trigger.connect(self.handleScore)
+        # self.score.start()
+        # self.pushButton.setEnabled(False)
+        # self.pushButton_2.setEnabled(False)
     
     def about_msg(self, message):
         reply = QMessageBox.about(self, "標題", "<font color='white'><p>" + message + "</p> ")

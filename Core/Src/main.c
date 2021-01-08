@@ -326,12 +326,17 @@ int main(void)
 	  /* game */
 	  game();
 
-	  /* wait for retry signal*/
-
 	  /* send score */
 	  sprintf(sprintbuff,"%d\n", score);
 	  memcpy(uartbuff,sprintbuff,sizeof(sprintbuff));
 	  HAL_UART_Transmit(&huart2,uartbuff,sizeof(uartbuff),1000);
+
+	  /* wait for retry signal*/
+	  value = 0;
+	  while(!value)
+	  {
+		  HAL_UART_Receive(&huart2,(uint8_t *)&value,1, 1000);
+	  }
 
 	  /* reset */
 	  game_reset();
